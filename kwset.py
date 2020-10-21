@@ -22,15 +22,19 @@ def main():
     """
     dre = re.compile(''.join([r'\$', r'Date:?\$']))
     rre = re.compile(''.join([r'\$', r'Revision:?\$']))
+    bre = re.compile(''.join([r'\$', r'Branch:?\$']))
+    
     currp = os.getcwd()
     if not os.path.exists(currp + '/.git'):
         print >> sys.stderr, 'This directory is not controlled by git!'
         sys.exit(1)
     date = gitdate()
     rev = gitrev()
+    br = gitbranch()
     input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
     for line in input_stream:
         line = dre.sub(date, line)
+        line = bre.sub(br, line)
         print(rre.sub(rev, line), end="")
 
 
@@ -61,6 +65,18 @@ def gitrev():
         return ''.join(['$', 'Revision', '$'])
     return ''.join(['$', 'Revision: ', r, ' $'])
 
+def gitbranch():
+    """Get name of current branch
+    """
+    args = ['git', 'branch', '--show-current']
+    try:
+        r = subprocess.check_output(args,
+                                    stderr=subprocess.DEVNULL,
+                                    universal_newlines=True)[:-1]
+    except subprocess.CalledProcessError:
+        return ''.join(['$','Branch','$'])
+
+    return ''.join(['$', 'Branch: ', r, ' $'])
 
 if __name__ == '__main__':
     main()

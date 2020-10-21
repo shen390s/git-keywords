@@ -17,7 +17,10 @@ if __name__ == '__main__':
     drep = ''.join(['$', 'Date', '$'])
     rre = re.compile(''.join([r'\$', r'Revision.*\$']))
     rrep = ''.join(['$', 'Revision', '$'])
+    brre = re.compile(''.join([r'\$', r'Branch.*\$']))
+    brrep = ''.join(['$', 'Branch', '$'])
     input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
     for line in input_stream:
         line = dre.sub(drep, line)
+        line = brre.sub(brrep, line)
         print(rre.sub(rrep, line), end="")
